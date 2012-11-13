@@ -27,8 +27,8 @@ void check_stream(char *s) {
     fstream stream(s);
     if (!stream) {
         cerr << "Невозможно открыть файл " << s << endl
-             << "Обратитесь к администратору!" << endl; 
-        exit(1);   
+             << "Обратитесь к администратору!" << endl;
+        exit(1);
     }
     stream.close();
 }
@@ -56,28 +56,28 @@ long long create_id(string choice, ifstream &inRemoved) {
         if (choice == "book") book_id = removed_id;
         if (choice == "publisher") publisher_id = removed_id;
         
-        while (inRemoved >> r) 
+        while (inRemoved >> r)
             removedId.push_back(r);
               
-        if (choice == "author") { 
+        if (choice == "author") {
             ofstream outRemovedAuthor(REMOVED_AUTHOR);
             check_stream(REMOVED_AUTHOR);
             
-            for (int i = 0; i < removedId.size(); i++) 
+            for (int i = 0; i < removedId.size(); i++)
                 outRemovedAuthor << removedId[i] << endl;
         }
         if (choice == "book") {
             ofstream outRemovedBook(REMOVED_AUTHOR);
             check_stream(REMOVED_AUTHOR);
             
-            for (int i = 0; i < removedId.size(); i++) 
+            for (int i = 0; i < removedId.size(); i++)
                 outRemovedBook << removedId[i] << endl;
         }
         if (choice == "publisher") {
             ofstream outRemovedPublisher(REMOVED_BOOK);
             check_stream(REMOVED_BOOK);
             
-            for (int i = 0; i < removedId.size(); i++) 
+            for (int i = 0; i < removedId.size(); i++)
                 outRemovedPublisher << removedId[i] << endl;
         }
     }
@@ -92,8 +92,8 @@ long long create_id(string choice, ifstream &inRemoved) {
         
         check_stream(LAST_ID);
         
-        outLastId << author_id  << endl
-              << book_id << endl 
+        outLastId << author_id << endl
+              << book_id << endl
               << publisher_id;
     }
     
@@ -102,20 +102,23 @@ long long create_id(string choice, ifstream &inRemoved) {
     if (choice == "publisher") return publisher_id;
 }
 
-int enter_choice() {    
-    cout << endl << "Выберите, что будем изменять:" << endl
-         << "1 - название" << endl
-         << "2 - год издания" << endl
-         << "3 - ISBN" << endl
-         << "4 - ББК" << endl
-         << "5 - обложка" << endl
-         << "6 - аннотация" << endl
-         << "0 - назад" << endl;
-   
+int enter_choice() {
     int menuChoice;
-    cin >> menuChoice;
+    string choice = " ";
+    while (!(atoi(choice.c_str())) && choice != "0") {
+        cout << endl << "Выберите, что будем изменять:" << endl
+             << "1 - название" << endl
+             << "2 - год издания" << endl
+             << "3 - ISBN" << endl
+             << "4 - ББК" << endl
+             << "5 - обложка" << endl
+             << "6 - аннотация" << endl
+             << "0 - назад" << endl;
+   
+        cin >> choice;
+    }
     
-    return menuChoice;
+    return menuChoice = menuChoice = atoi(choice.c_str());
 }
 
 //------------------------------------------------------------------------------
@@ -131,7 +134,7 @@ struct Id {
 
 // parent class
 
-class ClassWithId {    
+class ClassWithId {
 public:
     long long id;
 };
@@ -225,7 +228,7 @@ bool CheckBook_AuthorRelation(long long book_id, long long author_id) {
     inAuthor.seekg((author_id - 1) * sizeof(author));
     inAuthor.read((char *) &author, sizeof(author));
 
-    if ((strcmp(book.book_name, " ") != 0) && (book_id <= book_last_id) && (book_id > 0) && (strcmp(author.author_name, " ") != 0) && (author_id <= author_last_id) && (author_id > 0)) 
+    if ((strcmp(book.book_name, " ") != 0) && (book_id <= book_last_id) && (book_id > 0) && (strcmp(author.author_name, " ") != 0) && (author_id <= author_last_id) && (author_id > 0))
         return true;
     else return false;
 }
@@ -252,7 +255,7 @@ bool CheckBook_PublisherRelation(long long book_id, long long publisher_id) {
     inPublisher.seekg((publisher_id - 1) * sizeof(publisher));
     inPublisher.read((char *) &publisher, sizeof(publisher));
 
-    if ((strcmp(book.book_name, " ") != 0) && (book_id <= book_last_id) && (book_id > 0) && (strcmp(publisher.publisher_name, " ") != 0) && (publisher_id <= publisher_last_id) && (publisher_id > 0)) 
+    if ((strcmp(book.book_name, " ") != 0) && (book_id <= book_last_id) && (book_id > 0) && (strcmp(publisher.publisher_name, " ") != 0) && (publisher_id <= publisher_last_id) && (publisher_id > 0))
         return true;
     else return false;
 }
@@ -293,7 +296,7 @@ bool CheckBook(long long book_id, Book book) {
 
 bool CheckPublisher(long long publisher_id, Publisher publisher) {
     ifstream inPublisher(PUBLISHERS, ios::in);
-    ifstream inLastId(LAST_ID);
+    ifstream inLastId(LAST_ID, ios::in);
     
     check_stream(BOOKS);
     check_stream(LAST_ID);
@@ -308,6 +311,56 @@ bool CheckPublisher(long long publisher_id, Publisher publisher) {
     else return false;
 }
 
+bool noBook_AuthorRelation(Id x) {
+    bool notExist = true;
+
+    ifstream inBook_Author(BOOK_AUTHOR, ios::in);
+
+    check_stream(BOOK_AUTHOR);
+
+    Id x1;
+
+    int i = 0;
+    while (!inBook_Author.eof()) {
+        inBook_Author.seekg(i * sizeof(x1));
+        inBook_Author.read((char *) &x1, sizeof(x1));
+
+        if (x.book_id == x1.book_id && x.relation_id == x1.relation_id) {
+            notExist = false;
+            break;
+        }
+
+        i++;
+    }
+
+    return notExist;
+}
+
+bool noBook_PublisherRelation(Id x) {
+    bool notExist = true;
+
+    ifstream inBook_Publisher(BOOK_PUBLISHER, ios::in);
+
+    check_stream(BOOK_PUBLISHER);
+
+    Id x1;
+
+    int i = 0;
+    while (!inBook_Publisher.eof()) {
+        inBook_Publisher.seekg(i * sizeof(x1));
+        inBook_Publisher.read((char *) &x1, sizeof(x1));
+
+        if (x.book_id == x1.book_id && x.relation_id == x1.relation_id) {
+            notExist = false;
+            break;
+        }
+
+        i++;
+    }
+
+    return notExist;    
+}
+
 //------------------------------------------------------------------------------
 
 
@@ -316,9 +369,9 @@ bool CheckPublisher(long long publisher_id, Publisher publisher) {
 class Author_Mng {
 public:
     static long long create_author();
-    static void delete_author(long long);
+    static long long delete_author(long long);
     static long long replace_author(long long);
-    static void show_author(long long);
+    static long long show_author(long long);
 };
 
 long long Author_Mng::create_author() {
@@ -331,14 +384,22 @@ long long Author_Mng::create_author() {
     check_stream(REMOVED_AUTHOR);
     
     Author author;
+    string str_name;
     
     cin.ignore();
     
     cout << endl << "Введите:" << endl;
     
     cout << "Имя автора" << endl;
-    cin.getline(author.author_name, sizeof(author.author_name));
-    
+    getline(cin, str_name);
+
+    if (str_name == "0") {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
+    for (int i = 0; i < 30; i++) author.author_name[i] = str_name[i];
+
     author.id = create_id("author", inRemovedAuthor);
     
     inOutAuthor.seekp((author.id - 1) * sizeof(author));
@@ -346,15 +407,34 @@ long long Author_Mng::create_author() {
 
     cout << "Запись успешно создана." << endl;
     
-    cout << "Создать связь? (1 - да):" << endl;
-    int choice;
-    cin >> choice;
+    string choice = " ";
+    while (!(atoi(choice.c_str()))) {
+        cout << "Создать связь? (1 - да, 2 - нет):" << endl;
+
+        cin >> choice;
+
+        if (choice == "1" || choice == "2") {}
+        else choice = " "; 
+    }
+    
               
-        if (choice == 1) {
-            cout << "Введите Id книги, с которой будет создана связь:" << endl;
+        if (choice == "1") {
+            choice = " ";
+
+            while (!(atoi(choice.c_str())) && choice != "0") {
+                cout << "Введите Id книги, с которой будет создана связь:" << endl;
+                cin >> choice;
+            } 
+
                 Id x;
                 x.relation_id = author.id;
-                cin >> x.book_id;
+                x.book_id = atoi(choice.c_str());
+
+                if (choice == "0") {
+                    cout << "Отмена операции" << endl;
+                    return 0;
+                }
+
                 bool checked = CheckBook_AuthorRelation(x.book_id, author.id);
                                     
                 if (checked == true) {
@@ -367,7 +447,12 @@ long long Author_Mng::create_author() {
     return author.id;
 }
 
-void Author_Mng::delete_author(long long id) {
+long long Author_Mng::delete_author(long long id) { 
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     fstream inOutAuthor(AUTHORS, ios::in |ios::out);
     ofstream outRemovedAuthor(REMOVED_AUTHOR, ios::app);
     fstream inOutLastId(LAST_ID);
@@ -400,23 +485,47 @@ void Author_Mng::delete_author(long long id) {
 //------------------------------------------------------------------------------
 
 long long Author_Mng::replace_author(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     fstream inOutAuthor(AUTHORS, ios::in | ios::out);
+    ifstream inLastId(LAST_ID, ios::in);
 
     check_stream(AUTHORS);
     
     Author author;
+    string str_name;
+    long long last_id;
+
+    inLastId >> last_id;
+
+    cin.ignore();
     
     inOutAuthor.seekg((id - 1) * sizeof(author));
-    inOutAuthor.read((char *) &author, sizeof(author));   
+    inOutAuthor.read((char *) &author, sizeof(author));
+
+    if ((strcmp(author.author_name, " ") != 0) && (id <= last_id) && (id > 0)) { 
+        cout << "Введите новое имя автора" << endl;
     
-    cout << "Введите новое имя автора" << endl;
-    cin >> author.author_name;
+        getline(cin, str_name);
+        for (int i = 0; i < 30; i++) author.author_name[i] = str_name[i];
     
-    inOutAuthor.seekp((id - 1) * sizeof(author));
-    inOutAuthor.write((char *) &author, sizeof(author));
+        inOutAuthor.seekp((id - 1) * sizeof(author));
+        inOutAuthor.write((char *) &author, sizeof(author));
+
+        cout << "Запись успешно изменена." << endl;
+    }
+    else cout << "Запись не существует" << endl;
 }
 
-void Author_Mng::show_author(long long id) {
+long long Author_Mng::show_author(long long id) {
+    if (id == 0) {
+        cout << "Операция отменена" << endl;
+        return 0;
+    }
+
     fstream inAuthor(AUTHORS, ios::in);
     check_stream(AUTHORS);
 
@@ -426,11 +535,10 @@ void Author_Mng::show_author(long long id) {
 
     if (checked == true) {
         inAuthor.seekg((id - 1) * sizeof(author));
-        inAuthor.read((char *) &author, sizeof(author)); 
+        inAuthor.read((char *) &author, sizeof(author));
 
         cout << "id: " << author.id << endl
-             << "Имя автора: " << author.author_name << endl; 
-
+             << "Имя автора: " << author.author_name << endl;
     }
     else cout << "Автор не существует!" << endl;
 }
@@ -440,9 +548,9 @@ void Author_Mng::show_author(long long id) {
 class Book_Mng {
 public:
     static long long create_book();
-    static void delete_book(long long);
+    static long long delete_book(long long);
     static long long replace_book(long long);
-    static void show_book(long long);
+    static long long show_book(long long);
 };
 
 long long Book_Mng::create_book() {
@@ -457,32 +565,83 @@ long long Book_Mng::create_book() {
     check_stream(REMOVED_BOOK);
             
     Book book;
+    string str_name, str_year, str_ISBN, str_BBK, str_cover, str_annotation;
     
     cin.ignore();
     
     cout << endl << "Введите:" << endl;
 
     cout << "Название книги" << endl << "? ";
-    cin.getline(book.book_name, sizeof(book.book_name));
+    getline(cin, str_name);
+
+    if (str_name == "0") {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
+    for (int i = 0; i < 20; i++) book.book_name[i] = str_name[i];
     
-    cout << "Год издания" << endl << "? ";
-    cin >> book.book_release_year;
+    str_year = " ";
+    while (!(atoi(str_year.c_str()))) {
+        cout << "Год издания" << endl << "? ";
+        cin >> str_year;
+
+        if (str_year == "0") {
+            cout << "Отмена операции" << endl;
+            return 0;
+        }
+        if (atoi(str_year.c_str()) > 2012 || atoi(str_year.c_str()) < 1400) str_year = " ";
+    }
     
     cin.ignore();
     
     cout << "ISBN" << endl << "? ";
-    cin.getline(book.ISBN, sizeof(book.ISBN));
+    getline(cin, str_ISBN);
+
+    if (str_ISBN == "0") {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
+    for (int i = 0; i < 13; i++) book.ISBN[i] = str_ISBN[i];
 
     cout << "ББК" << endl << "? ";
-    cin.getline(book.BBK, sizeof(book.BBK));
+    getline(cin, str_BBK);
 
-    cout << "Супер-обложка ( 1 - есть; 0 - нет )" << endl << "? ";
-    cin >> book.cover;
+    if (str_BBK == "0") {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
+    for (int i = 0; i < 10; i++) book.BBK[i] = str_BBK[i];
+
+    str_cover = " ";
     
+    while (!atoi(str_cover.c_str())) {
+        cout << "Супер-обложка (1 - есть; 2 - нет)" << endl << "? ";
+        cin >> str_cover;
+
+        if (str_cover == "0") {
+            cout << "Отмена оперции" << endl;
+            return 0;
+        } 
+
+        if (str_cover != "1" && str_cover != "2") str_cover = " ";
+    }
+
+    book.cover = atoi(str_cover.c_str());
+
     cin.ignore();
 
     cout << "Аннотация" << endl << "? ";
-    cin.getline(book.annotation, sizeof(book.annotation));
+    getline(cin, str_annotation);
+
+    if (str_annotation == "0") {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
+    for (int i = 0; i < 100; i++) book.annotation[i] = str_annotation[i];
 
     book.id = create_id("book", inRemovedBook);
     
@@ -491,28 +650,58 @@ long long Book_Mng::create_book() {
 
     cout << "Книга успешно создана." << endl;
     
-    cout << "Создать связь (1 - да)" << endl;
     int choice;
-    cin >> choice;
+    string str_choice = " ";
+
+    while (!(atoi(str_choice.c_str()))) {
+        cout << "Создать связь (1 - да, 2 - нет)" << endl;
+        cin >> str_choice;
+
+        if (str_choice != "1" && str_choice != "2") str_choice = " ";
+    }
+
+    choice = atoi(str_choice.c_str()); 
     
-    if (choice == 1) {  
+    if (choice == 1) {
         int next_choice;
-        cout << "Связь с 1 - автором, 2 - издательством" << endl;
-        cin >> next_choice;
-        
+        str_choice = " ";
+
+        while (!(atoi(str_choice.c_str()))) {
+            cout << "Связь с 1 - автором, 2 - издательством" << endl;
+            cin >> str_choice;
+
+            if (str_choice == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+
+            if (str_choice != "1" && str_choice != "2") str_choice = " ";
+        }
+
+        next_choice = atoi(str_choice.c_str());
+
         bool checked;
 
         switch (next_choice) {
             case 1:
-                cout << "Введите Id автора, с которым будет создана связь:" << endl;    
+                str_choice = " ";
+                while (!(atoi(str_choice.c_str()))) {
+                    cout << "Введите Id автора, с которым будет создана связь:" << endl;
+                    cin >> str_choice;
+
+                    if (str_choice == "0") {
+                        cout << "Отмена операции" << endl;
+                        return 0;
+                    }
+                }
                   
                 Id x;
                 x.book_id = book.id;
-                cin >> x.relation_id;
+                x.relation_id = atoi(str_choice.c_str());
 
                 checked = CheckBook_AuthorRelation(x.book_id, x.relation_id);
 
-                if (checked == true) { 
+                if (checked == true) {
                     outBook_Author.write((char *) &x, sizeof(x));
                     cout << "Связь успешно создана." << endl;
                 }
@@ -521,11 +710,21 @@ long long Book_Mng::create_book() {
                 break;
                 
             case 2:
-                cout << "Введите Id издательства, с которым будет создана связь:" << endl;
+                str_choice = " ";
+
+                while (!(atoi(str_choice.c_str()))) {
+                    cout << "Введите Id издательства, с которым будет создана связь:" << endl;
+                    cin >> str_choice;
+
+                    if (str_choice == "0") {
+                        cout << "Отмена операции" << endl;
+                        return 0;
+                    }
+                }
                 
                 Id x1;
                 x1.book_id = book.id;
-                cin >> x1.relation_id;
+                x1.relation_id = atoi(str_choice.c_str());
                                
                 checked = CheckBook_PublisherRelation(book.id, x1.relation_id);
 
@@ -540,13 +739,18 @@ long long Book_Mng::create_book() {
             default:
                 cout << "Ошибка ввода!" << endl;
                 break;
-        }           
+        }
     }
             
     return book.id;
 }
 
-void Book_Mng::delete_book(long long id) {
+long long Book_Mng::delete_book(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     fstream inOutBook(BOOKS, ios::in |ios::out);
     ofstream outLastId(REMOVED_BOOK, ios::app);
     ifstream inLastId(LAST_ID);
@@ -577,23 +781,45 @@ void Book_Mng::delete_book(long long id) {
 }
 
 long long Book_Mng::replace_book(long long id) {
+    if (id == 0) {
+        cout << "Отмена оперции" << endl;
+        return 0;
+    }
+
     fstream inOutBook(BOOKS, ios::in | ios::out);
-    
+    ifstream inLastId(LAST_ID, ios::in);
+
+    check_stream(LAST_ID);
     check_stream(BOOKS);
     
     Book book;
     int choice;
+    int i;
+
+    long long last_id;
+    inLastId >> last_id >> last_id;
+
+    inOutBook.seekg((id - 1) * sizeof(book));
+    inOutBook.read((char *) &book, sizeof(book));
+
+if ((strcmp(book.book_name, " ") != 0) && (id <= last_id) && (id > 0)) { 
             
     while ((choice = enter_choice()) != 0) {
-      inOutBook.seekg((id - 1) * sizeof(book));
-      inOutBook.read((char *) &book, sizeof(book));  
+      string str_name, str_year, str_ISBN, str_BBK, str_cover, str_annotation;
       
       switch (choice) {
           case 1: // new name
               cin.ignore();
               
               cout << "Введите новое название книги:" << endl;
-              cin.getline(book.book_name, sizeof(book.book_name));
+              getline(cin, str_name);
+
+              if (str_name == "0") {
+                cout << "Отмена операции" << endl;
+                break;
+              }
+
+              for (i = 0; i < 20; i++) book.book_name[i] = str_name[i];
               
               inOutBook.seekp((id - 1) * sizeof(book));
               inOutBook.write((char *) &book, sizeof(book));
@@ -602,8 +828,21 @@ long long Book_Mng::replace_book(long long id) {
               break;
           
           case 2: // new book_release_year
-              cout << "Введите новый год издания:" << endl;
-              cin >> book.book_release_year;
+              str_year = " ";
+              
+              while (!(atoi(str_year.c_str()))) {
+                cout << "Введите новый год издания:" << endl;
+                cin >> str_year;
+
+                if (str_year == "0") {
+                    cout << "Отмена операции" << endl;
+                    break;
+                }
+
+                if (atoi(str_year.c_str()) > 2012 && atoi(str_year.c_str()) < 1400) str_year = " ";
+              }
+
+              book.book_release_year = atoi(str_year.c_str());
               
               inOutBook.seekp((id - 1) * sizeof(book));
               inOutBook.write((char *) &book, sizeof(book));
@@ -615,7 +854,14 @@ long long Book_Mng::replace_book(long long id) {
               cin.ignore();
               
               cout << "Введите новый ISBN:" << endl;
-              cin.getline(book.ISBN, sizeof(book.ISBN));
+              getline(cin, str_ISBN);
+
+              if (str_ISBN == "0") {
+                cout << "Отмена оперции" << endl;
+                break;
+              }
+
+              for (i = 0; i < 13; i++) book.ISBN[i] = str_ISBN[i];
               
               inOutBook.seekp((id - 1) * sizeof(book));
               inOutBook.write((char *) &book, sizeof(book));
@@ -624,8 +870,17 @@ long long Book_Mng::replace_book(long long id) {
               break;
               
           case 4: // new BBK
+              cin.ignore();
+
               cout << "Введите новый ББК:" << endl;
-              cin.getline(book.BBK, sizeof(book.BBK));
+              getline(cin, str_BBK);
+
+              if (str_BBK == "0") {
+                cout << "Отмена операции" << endl;
+                break; 
+              }
+
+              for (i = 0; i < 15; i++) book.BBK[i] = str_BBK[i];
               
               inOutBook.seekp((id - 1) * sizeof(book));
               inOutBook.write((char *) &book, sizeof(book));
@@ -634,9 +889,22 @@ long long Book_Mng::replace_book(long long id) {
               break;
               
           case 5: // new cover
-              cout << "Изменеие обложки:" << endl;
-              cin >> book.cover;
-              
+              str_cover = " ";
+
+              while (!(atoi(str_cover.c_str()))) {
+                cout << "Изменеие обложки:" << endl;
+                cin >> str_cover;
+
+                if (str_cover == "0") {
+                    cout << "Отмена операции" << endl;
+                    break;
+                }
+
+                if (str_cover != "1" && str_cover != "2") str_cover = " ";
+              }
+
+              book.cover = atoi(str_cover.c_str());
+
               inOutBook.seekp((id - 1) * sizeof(book));
               inOutBook.write((char *) &book, sizeof(book));
 
@@ -647,7 +915,8 @@ long long Book_Mng::replace_book(long long id) {
               cin.ignore();
               
               cout << "Введите новую аннотацию:" << endl;
-              cin.getline(book.annotation, sizeof(book.annotation));
+              getline(cin, str_annotation);
+              for (i = 0; i < 100; i++) book.annotation[i] = str_annotation[i];
               
               inOutBook.seekp((id - 1) * sizeof(book));
               inOutBook.write((char *) &book, sizeof(book));
@@ -661,8 +930,14 @@ long long Book_Mng::replace_book(long long id) {
       }
     }
 }
+else cout << "Книга не существует" << endl;
+}
 
-void Book_Mng::show_book(long long id) {
+long long Book_Mng::show_book(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    } 
     fstream inBook(BOOKS, ios::in);
     
     check_stream(BOOKS);
@@ -687,7 +962,7 @@ void Book_Mng::show_book(long long id) {
              << "Супер-обложка: " << cover << endl
              << "Аннотация: " << book.annotation << endl;
     }
-    else cout << "Книга не существует!" << endl; 
+    else cout << "Книга не существует!" << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -695,9 +970,9 @@ void Book_Mng::show_book(long long id) {
 class Publisher_Mng {
 public:
     static long long create_publisher();
-    static void delete_publisher(long long);
-    static long long replace_publisher(long long); 
-    static void show_publisher(long long);
+    static long long delete_publisher(long long);
+    static long long replace_publisher(long long);
+    static long long show_publisher(long long);
 };
 
 long long Publisher_Mng:: create_publisher() {
@@ -710,13 +985,15 @@ long long Publisher_Mng:: create_publisher() {
     check_stream(REMOVED_PUBLISHER);
     
     Publisher publisher;
+    string str_name;
     
     cin.ignore();
     
     cout << endl << "Введите:" << endl;
     
     cout << "Название издательства:" << endl;
-    cin.getline(publisher.publisher_name, sizeof(publisher.publisher_name));
+    getline(cin, str_name);
+    for (int i = 0; i < 20; i++) publisher.publisher_name[i] = str_name[i];
     
     publisher.id = create_id("publisher", inRemovedPublisher);
     
@@ -726,29 +1003,47 @@ long long Publisher_Mng:: create_publisher() {
     cout << "Запись успешно создана." << endl;
     
     int choice;
-    cout << "Создать связь? (1 - да):" << endl;
-    cin >> choice;
-              
-        if (choice == 1) {            
-            cout << "Введите Id книги, с которой будет создана связь:" << endl;
-                
-            Id x;
-            x.relation_id = publisher.id;
-            cin >> x.book_id;
-            
-            bool checked = CheckBook_PublisherRelation(x.book_id, publisher.id);
+    string str_choice = " ";
 
-            if (checked == true) { 
-                outBook_Publisher.write((char *) &x, sizeof(x));
-                cout << "Связь успешно создана." << endl;
-            } 
-            else cout << "Книга не существует!" << endl;
+    while (!(atoi(str_choice.c_str()))) {
+        cout << "Создать связь? (1 - да, 2 - нет):" << endl;
+        cin >> str_choice;
+
+        if (str_choice != "1" && str_choice != "2") str_choice = " ";
+    }
+
+    choice = atoi(str_choice.c_str());
+              
+    if (choice == 1) {
+        str_choice = " ";
+
+        while (!(atoi(str_choice.c_str()))) {
+            cout << "Введите Id книги, с которой будет создана связь:" << endl;
+            cin >> str_choice;
         }
+                
+        Id x;
+        x.relation_id = publisher.id;
+        x.book_id = atoi(str_choice.c_str());
+            
+        bool checked = CheckBook_PublisherRelation(x.book_id, publisher.id);
+
+        if (checked == true) {
+            outBook_Publisher.write((char *) &x, sizeof(x));
+            cout << "Связь успешно создана." << endl;
+        }
+        else cout << "Книга не существует!" << endl;
+    }
     
     return publisher.id;
 }
 
-void Publisher_Mng::delete_publisher(long long id) {
+long long Publisher_Mng::delete_publisher(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     fstream inOutPublisher(PUBLISHERS, ios::in |ios::out);
     ofstream outLastId(REMOVED_PUBLISHER, ios::app);
     ifstream inLastId(LAST_ID);
@@ -758,7 +1053,7 @@ void Publisher_Mng::delete_publisher(long long id) {
     check_stream(LAST_ID);
     
     long long last_id;
-    inLastId >> last_id;
+    inLastId >> last_id >> last_id >> last_id;
     
     Publisher publisher;
     
@@ -779,25 +1074,46 @@ void Publisher_Mng::delete_publisher(long long id) {
 }
 
 long long Publisher_Mng::replace_publisher(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
    fstream inOutPublisher(PUBLISHERS, ios::in | ios::out);
+   ifstream inLastId(LAST_ID, ios::in);
     
    check_stream(PUBLISHERS);
     
    Publisher publisher;
-    
-   inOutPublisher.seekg((id - 1) * sizeof(publisher));
-   inOutPublisher.read((char *) &publisher, sizeof(publisher));   
-    
-   cout << "Введите новое имя автора" << endl;
-   cin >> publisher.publisher_name;
-    
-   inOutPublisher.seekp((id - 1) * sizeof(publisher));
-   inOutPublisher.write((char *) &publisher, sizeof(publisher));
+   string str_name;
+   long long last_id;
 
-   cout << "Запись успешно изменена." << endl; 
+   inLastId >> last_id >> last_id >> last_id;
+
+   inOutPublisher.seekg((id - 1) * sizeof(publisher));
+   inOutPublisher.read((char *) &publisher, sizeof(publisher));
+
+   if (strcmp(publisher.publisher_name, " ") != 0 && id <= last_id && id > 0) {
+        cin.ignore();
+
+        cout << "Введите новое имя автора" << endl;
+        getline(cin, str_name);
+        
+        for (int i = 0; i < 20; i++) publisher.publisher_name[i] = str_name[i];
+    
+        inOutPublisher.seekp((id - 1) * sizeof(publisher));
+        inOutPublisher.write((char *) &publisher, sizeof(publisher));
+
+        cout << "Запись успешно изменена." << endl;
+   }
+   else cout << "Издательство не существует" << endl;
 }
 
-void Publisher_Mng::show_publisher(long long id) {
+long long Publisher_Mng::show_publisher(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
     ifstream inPublisher(PUBLISHERS, ios::in);
         
     check_stream(PUBLISHERS);
@@ -813,7 +1129,7 @@ void Publisher_Mng::show_publisher(long long id) {
          cout << "id: " << publisher.id << endl
               << "Имя издательства: " << publisher.publisher_name << endl;
     }
-    else cout << "Издательство не существует!" << endl; 
+    else cout << "Издательство не существует!" << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -829,23 +1145,52 @@ public:
 };
 
 int Relation_Mng::create_relation(int relation_choice) {
+    if (relation_choice == 0) return 0;
+    
     if (relation_choice == 1) {
         ifstream inRemoved_BA(REMOVED_BA);
         
         check_stream(REMOVED_BA);
         
         Id x;
+        string str_id = " ";
         
-        cout << "Введите id книги" << endl;
-        cin >> x.book_id;
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id книги" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+        }
+
+        x.book_id = atoi(str_id.c_str());
+
+        str_id = " ";
         
-        cout << "Введите id автора" << endl;
-        cin >> x.relation_id;
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id автора" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+        }
+
+        x.relation_id = atoi(str_id.c_str());
 
         bool checked = CheckBook_AuthorRelation(x.book_id, x.relation_id);
+        bool notExist = noBook_AuthorRelation(x);
 
         if (checked == false) {
             cout << "Невозможно создать связь, заданные записи не существуют!" << endl;
+            return 0;
+        }
+
+        if (notExist == false) {
+            cout << "Невозможно создать, заданная связь уже существует!" << endl;
             return 0;
         }
         
@@ -867,7 +1212,7 @@ int Relation_Mng::create_relation(int relation_choice) {
         
             while (inRemoved_BA >> r) {
                 removedId.push_back(r);
-            } 
+            }
 
             ofstream outRemoved_BA(REMOVED_BA);
             
@@ -880,7 +1225,7 @@ int Relation_Mng::create_relation(int relation_choice) {
             inOutBook_AuthorRelation.seekp((pos - 1) * sizeof(x));
             inOutBook_AuthorRelation.write((char *) &x, sizeof(x));
         }
-        else {   
+        else {
             ofstream outBook_AuthorRelation(BOOK_AUTHOR, ios::app);
             
             check_stream(BOOK_AUTHOR);
@@ -894,17 +1239,44 @@ int Relation_Mng::create_relation(int relation_choice) {
         check_stream(REMOVED_BP);
         
         Id x;
+        string str_id = " ";
         
-        cout << "Введите id книги" << endl;
-        cin >> x.book_id;
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id книги" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+        }
+
+        x.book_id = atoi(str_id.c_str());
         
-        cout << "Введите id издательства" << endl;
-        cin >> x.relation_id;
+        str_id = " ";
+
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id издательства" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+        }
+
+        x.relation_id = atoi(str_id.c_str());
 
         bool checked = CheckBook_PublisherRelation(x.book_id, x.relation_id);
+        bool notExist = noBook_PublisherRelation(x);
 
         if (checked == false) {
-            cout << "Невозможно создать, заданные элементы не существуют!" << endl;
+            cout << "Невозможно создать связь, заданные элементы не существуют!" << endl;
+            return 0;
+        }
+
+        if (notExist == false) {
+            cout << "Невозможно создать, связь уже существует!" << endl;
             return 0;
         }
         
@@ -926,7 +1298,7 @@ int Relation_Mng::create_relation(int relation_choice) {
         
             while (inRemoved_BP >> r) {
                 removedId.push_back(r);
-            } 
+            }
 
             ofstream outRemoved_BP(REMOVED_BP);
             
@@ -939,7 +1311,7 @@ int Relation_Mng::create_relation(int relation_choice) {
             inOutBook_Publisher.seekp((pos - 1) * sizeof(x));
             inOutBook_Publisher.write((char *) &x, sizeof(x));
         }
-        else {   
+        else {
             ofstream outBook_Author(BOOK_PUBLISHER, ios::app);
             
             check_stream(BOOK_PUBLISHER);
@@ -952,6 +1324,8 @@ int Relation_Mng::create_relation(int relation_choice) {
 }
 
 int Relation_Mng::delete_relation(int choice) {
+    if (choice == 0) return 0;
+
     if (choice == 1) {
         fstream inOutBook_Author(BOOK_AUTHOR, ios::in | ios::out);
         ofstream outRemoved_BA(REMOVED_BA, ios::app);
@@ -960,29 +1334,50 @@ int Relation_Mng::delete_relation(int choice) {
         check_stream(REMOVED_BA);
         
         Id x;
+        string str_id = " ";
         
         long long a, b;
         
-        cout << "Введите id книги для удаления из связей" << endl;
-        cin >> b;
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id книги для удаления из связей" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+        }
+
+        b = atoi(str_id.c_str());
+
+        str_id = " ";
         
-        cout << "Введите id автора для удаления из связей" << endl;
-        cin >> a;
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id автора для удаления из связей" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+        }
+
+        a = atoi(str_id.c_str());
 
         bool checked = CheckBook_AuthorRelation(b, a);
 
         if (checked == false) {
-            cout << "Невозможно создать связь, заданные элементы не существуют!" << endl;
+            cout << "Невозможно удалить связь, заданные элементы не существуют!" << endl;
             return 0;
         }
             
         long long i = 1;
         
-        while (!inOutBook_Author.eof()) {            
+        while (!inOutBook_Author.eof()) {
             inOutBook_Author.seekg((i - 1) * sizeof(x));
             inOutBook_Author.read((char *) &x, sizeof(x));
             
-            if ((a == x.relation_id) && (b == x.book_id)) {               
+            if ((a == x.relation_id) && (b == x.book_id)) {
                 x.relation_id = 0;
                 x.book_id = 0;
                 
@@ -993,9 +1388,9 @@ int Relation_Mng::delete_relation(int choice) {
                 break;
             }
             i++;
-        }      
+        }
     }
-    if (choice == 2) {   
+    if (choice == 2) {
         fstream inOutBook_Publisher(BOOK_PUBLISHER, ios::in | ios::out);
         ofstream outRemoved_BP(REMOVED_BP, ios::app);
               
@@ -1003,14 +1398,35 @@ int Relation_Mng::delete_relation(int choice) {
         check_stream(REMOVED_BP);
         
         Id x;
-        
+        string str_id;
+
         long long p, b;
         
-        cout << "Введите id книги для удаления из связей" << endl;
-        cin >> b;
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id книги для удаления из связей" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена оперции" << endl;
+                return 0;
+            }
+        }
         
-        cout << "Введите id издательства для удаления из связей" << endl;
-        cin >> p;
+        b = atoi(str_id.c_str());
+
+        str_id = " ";
+
+        while (!(atoi(str_id.c_str()))) {
+            cout << "Введите id издательства для удаления из связей" << endl;
+            cin >> str_id;
+
+            if (str_id == "0") {
+                cout << "Отмена операции" << endl;
+                return 0;
+            }
+        }
+
+        p = atoi(str_id.c_str());
 
         bool checked = CheckBook_PublisherRelation(b, p);
 
@@ -1036,13 +1452,18 @@ int Relation_Mng::delete_relation(int choice) {
                 break;
             }
             i++;
-        }      
+        }
     }
 
     cout << "Связь успешно удалена." << endl;
 }
 
 int Relation_Mng::show_author_relation(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     ifstream inBook_Author(BOOK_AUTHOR);
     ifstream inBook(BOOKS);
     ifstream inAuthor(AUTHORS);
@@ -1064,7 +1485,7 @@ int Relation_Mng::show_author_relation(long long id) {
     inAuthor.seekg((id - 1) * sizeof(author));
     inAuthor.read((char *) &author, sizeof(author));
     
-    cout << "Книги " << author.author_name <<  ":" << endl;
+    cout << "Книги " << author.author_name << ":" << endl;
     
     long long i = 1;
     
@@ -1085,6 +1506,11 @@ int Relation_Mng::show_author_relation(long long id) {
 }
 
 int Relation_Mng::show_book_author_relation(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     ifstream inBook_Author(BOOK_AUTHOR);
     ifstream inBook(BOOKS);
     ifstream inAuthor(AUTHORS);
@@ -1127,6 +1553,11 @@ int Relation_Mng::show_book_author_relation(long long id) {
 }
 
 int Relation_Mng::show_book_publisher_relation(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     ifstream inBook_Publisher(BOOK_PUBLISHER);
     ifstream inBook(BOOKS);
     ifstream inPublisher(PUBLISHERS);
@@ -1169,6 +1600,11 @@ int Relation_Mng::show_book_publisher_relation(long long id) {
 }
 
 int Relation_Mng::show_publisher_relation(long long id) {
+    if (id == 0) {
+        cout << "Отмена операции" << endl;
+        return 0;
+    }
+
     ifstream inBook_Publisher(BOOK_PUBLISHER);
     ifstream inBook(BOOKS);
     ifstream inPublisher(PUBLISHERS);
@@ -1204,7 +1640,7 @@ int Relation_Mng::show_publisher_relation(long long id) {
             inBook.seekg((x.book_id - 1) * sizeof(book));
             inBook.read((char *) &book, sizeof(book));
         
-            cout << book.id << " " << book.book_name << endl;    
+            cout << book.id << " " << book.book_name << endl;
         }
         i++;
     }

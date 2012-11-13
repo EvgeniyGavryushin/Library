@@ -18,7 +18,8 @@ int main(int argc, char** argv) {
         switch (choice) {            
             case 1:  // create
                 while ((next_choice = CreateEnterChoice()) != 0) { 
-                    
+                    string choice = " ";
+                    int relation_choice;
                     switch (next_choice) {
                         case 1: // author
                             Author_Mng::create_author();
@@ -33,12 +34,18 @@ int main(int argc, char** argv) {
                             break;
                             
                         case 4: // relation
-                            int relation_choice;
-                            cout << endl << "Выберите:" << endl
-                                 << "1 - книга-автор" << endl
-                                 << "2 - книга-издательство" << endl;        
-                            cin >> relation_choice;
-                        
+                            while (!(atoi(choice.c_str())) && choice != "0") {
+                                cout << endl << "Выберите:" << endl
+                                     << "1 - книга-автор" << endl
+                                     << "2 - книга-издательство" << endl      
+                                     << "0 - назад" << endl;  
+                                
+                                cin >> choice;
+
+                                if (choice == "1" || choice == "2" || choice == "0") relation_choice = atoi(choice.c_str());
+                                else choice = " ";
+                            }
+
                             Relation_Mng::create_relation(relation_choice);
                             break;
                                                     
@@ -51,36 +58,56 @@ int main(int argc, char** argv) {
             
             case 2: // delete
                 while ((next_choice = DeleteEnterChoice()) != 0) { 
-                    
+                    string choice = " ";
                     switch (next_choice) {
-                        case 1: // author              
-                            cout << "Введите id автора для удаления:" << endl;
+                        case 1: // author
+                            while (!(atoi(choice.c_str())) && choice != "0") {              
+                                cout << "Введите id автора для удаления:" << endl;
+                                cin >> choice;
+                            }
+
                             long long id;
-                            cin >> id;     
+                            id = atoi(choice.c_str());    
                             
                             Author_Mng::delete_author(id);
                             break;
  
                         case 2: // book
-                            cout << "Введите id книги для удаления:" << endl;
-                            cin >> id;
+                            while (!(atoi(choice.c_str())) && choice != "0") {
+                                cout << "Введите id книги для удаления:" << endl;
+                                cin >> choice;
+                            }
+
+                            id = atoi(choice.c_str());
                             
                             Book_Mng::delete_book(id);
                             break;
                             
                         case 3: // publisher
-                            cout << "Введите id издательства для удаления:" << endl;
-                            cin >> id;
+                            while (!(atoi(choice.c_str())) && choice != "0") { 
+                                cout << "Введите id издательства для удаления:" << endl;
+                                cin >> choice;
+                            }
+
+                            id = atoi(choice.c_str());
                             
                             Publisher_Mng::delete_publisher(id);
                             break;
                             
                         case 4: // relation
                             int relation_choice;
-                            cout << endl << "Выберите:" << endl
-                                 << "1 - книга-автор" << endl
-                                 << "2 - книга-издательство" << endl;
-                            cin >> relation_choice;
+
+                            while (!(atoi(choice.c_str())) && choice != "0") { 
+                                cout << endl << "Выберите:" << endl
+                                     << "1 - книга-автор" << endl
+                                     << "2 - книга-издательство" << endl
+                                     << "0 - назад" << endl;
+
+                                cin >> choice;
+
+                                if ((choice == "1" || choice == "2" || choice == "0")) relation_choice = atoi(choice.c_str());
+                                else choice = " ";
+                            }
                         
                             Relation_Mng::delete_relation(relation_choice);
                             break;
@@ -94,26 +121,39 @@ int main(int argc, char** argv) {
                 
             case 3: // replace
                 while ((next_choice = ReplaceEnterChoice()) != 0) {
-                    
+                    string choice = " ";
+                
                     switch (next_choice) {
                         case 1: // author
+                            while (!(atoi(choice.c_str())) && choice != "0") {              
+                                cout << "Введите id автора для изменения:" << endl;
+                                cin >> choice;
+                            }
+
                             long long id;
-                            cout << "Введите id книги для изменения:" << endl;
-                            cin >> id;
+                            id = atoi(choice.c_str());
                             
                             Author_Mng::replace_author(id);
                             break;
                             
                         case 2: // book
-                            cout << "Введите id книги для изменения" << endl;
-                            cin >> id;
+                            while (!(atoi(choice.c_str())) && choice != "0") {
+                                cout << "Введите id книги для изменения" << endl;
+                                cin >> choice;
+                            }
+
+                            id = atoi(choice.c_str());
                             
                             Book_Mng::replace_book(id);
                             break;
                             
                         case 3: // publisher
-                            cout << "Введите id издательства для изменения" << endl;
-                            cin >> id;
+                            while (!(atoi(choice.c_str())) && choice != "0") {
+                                cout << "Введите id издательства для изменения" << endl;
+                                cin >> choice;
+                            }
+
+                            id = atoi(choice.c_str());
                             
                             Publisher_Mng::replace_publisher(id);
                             break;
@@ -127,43 +167,100 @@ int main(int argc, char** argv) {
                 
             case 4: // show
                 while ((next_choice = ShowEnterChoice()) != 0) {
-                    
+                    string choice = " ";
                     switch (next_choice) {
                         case 1: // author
                             int show_choice;
-                            cout << "Показать 1 - отдельно, 2 - связи" << endl;                            
-                            cin >> show_choice;
+
+                            while (!(atoi(choice.c_str()))) {
+                                cout << "Показать 1 - отдельно, 2 - связи" << endl;                            
+                                cin >> choice;
+
+                                if (choice == "0") break;
+
+                                if (choice == "1" || choice == "2" || choice == "0") show_choice = atoi(choice.c_str());
+                                else choice = " ";
+                            }
+
+                            if (choice == "0") {
+                                cout << "Отмена операции" << endl;
+                                break;
+                            }
                             
+                            choice = " ";
                             long long id;
-                            cout << "Введите id автора:" << endl;
-                            cin >> id;
+
+                            while (!(atoi(choice.c_str())) && choice != "0") {
+                                cout << "Введите id автора:" << endl;
+                                cin >> choice;
+                            }
+
+                            id = atoi(choice.c_str());
                             
                             if (show_choice == 1) {
                                 Author_Mng::show_author(id);
                             }
                             if (show_choice == 2) {                                  
                                 Relation_Mng::show_author_relation(id);
-                            }
+                            } 
                             break;
                             
                         case 2: // book
-                            cout << "Показать 1 - отдельно, 2 - связи" << endl;
-                            cin >> show_choice;
+                            while (!(atoi(choice.c_str()))) {
+                                cout << "Показать 1 - отдельно, 2 - связи" << endl;
+                                cin >> choice;
+
+                                if (choice == "0") break;
+
+                                if (choice == "1" || choice == "2") show_choice = atoi(choice.c_str());
+                                else choice = " ";
+                            }
+
+                            if (choice == "0") {
+                                cout << "Отмена операции" << endl;
+                                break;
+                            }
+
+                            choice = " ";
                             
                             if (show_choice == 1) {
-                                cout << "Введите id книги:" << endl;
-                                cin >> id;
+                                while (!(atoi(choice.c_str()))) {
+                                    cout << "Введите id книги:" << endl;
+                                    cin >> choice;
+                                }
                                 
+                                id = atoi(choice.c_str());
+
                                 Book_Mng::show_book(id);
                             }
                             if (show_choice == 2) {   
                                 int relation_choice;
-                                cout << "1 - книга-автор" << endl
-                                     << "2 - книга-издательство" << endl;
-                                cin >> relation_choice;
+
+                                while (!(atoi(choice.c_str()))) {
+                                    cout << "1 - книга-автор" << endl
+                                         << "2 - книга-издательство" << endl;
+                                    cin >> choice;
+
+                                    if (choice == "0") break;
+
+                                    if (choice != "1" && choice != "2") choice = " ";
+                                }
+
+                                if (choice == "0") {
+                                    cout << "Отмена операции" << endl;
+                                    break;
+                                }
+
+                                relation_choice = atoi(choice.c_str());
+
+                                choice = " ";
                                 
-                                cout << "Введите id книги:" << endl;
-                                cin >> id;
+                                while (!(atoi(choice.c_str())) && choice != "0") {
+                                    cout << "Введите id книги:" << endl;
+                                    cin >> choice;
+                                }
+
+                                id = atoi(choice.c_str());
                                 
                                 if (relation_choice == 1) {
                                     Relation_Mng::show_book_author_relation(id);
@@ -175,11 +272,30 @@ int main(int argc, char** argv) {
                             break;
                             
                         case 3: // publisher
-                            cout << "Показать 1 - отдельно, 2 - связи" << endl;
-                            cin >> show_choice;
+                            while (!(atoi(choice.c_str()))) {
+                                cout << "Показать 1 - отдельно, 2 - связи" << endl;
+                                cin >> choice;
+
+                                if (choice == "0") break;
+
+                                if (choice != "1" && choice != "2") choice = " ";
+                            }
+
+                            if (choice == "0") {
+                                cout << "Отмена операции" << endl;
+                                break;
+                            }
+
+                            show_choice = atoi(choice.c_str());
+
+                            choice = " ";
                             
-                            cout << "Введите id издательства:" << endl;
-                            cin >> id;
+                            while (!(atoi(choice.c_str())) && choice != "0") {
+                                cout << "Введите id издательства:" << endl;
+                                cin >> choice;
+                            }
+
+                            id = atoi(choice.c_str());
                             
                             if (show_choice == 1) {
                                 Publisher_Mng::show_publisher(id);
@@ -206,71 +322,90 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-int MenuEnterChoice() {   
-    cout << endl << "Выберите:" << endl
-         << "1 - создать" << endl
-         << "2 - удалить" << endl
-         << "3 - изменить" << endl
-         << "4 - показать" << endl
-         << "0 - выход" << endl;
-    
+int MenuEnterChoice() {
     int menuChoice;
-    cin >> menuChoice;
-    
-    return menuChoice;  
+    string choice = " ";   
+
+    while (!(atoi(choice.c_str())) && choice != "0") {
+        cout << endl << "Выберите:" << endl
+             << "1 - создать" << endl
+             << "2 - удалить" << endl
+             << "3 - изменить" << endl
+             << "4 - показать" << endl
+             << "0 - выход" << endl;
+
+         cin >> choice;
+    }
+
+    return menuChoice = atoi(choice.c_str());  
 }
 
 int CreateEnterChoice() {  
-    cout << endl << "Создать:" << endl 
-         << "1 - автора" << endl
-         << "2 - книгу" << endl
-         << "3 - издательство" << endl
-         << "4 - связь" << endl
-         << "0 - назад" << endl;
-
     int menuChoice;
-    cin >> menuChoice;
+    string choice = " ";
+    while (!(atoi(choice.c_str())) && choice != "0") {
+        cout << endl << "Создать:" << endl 
+             << "1 - автора" << endl
+             << "2 - книгу" << endl
+             << "3 - издательство" << endl
+             << "4 - связь" << endl
+             << "0 - назад" << endl;
+
+        cin >> choice;
+    }
     
-    return menuChoice;        
+    return menuChoice = atoi(choice.c_str());        
 }
 
 int DeleteEnterChoice() {  
-    cout << endl << "Удалить:" << endl 
-         << "1 - автора" << endl
-         << "2 - книгу" << endl
-         << "3 - издательство" << endl
-         << "4 - связь" << endl
-         << "0 - назад" << endl;
-
     int menuChoice;
-    cin >> menuChoice;
+    string choice = " ";
+
+    while (!(atoi(choice.c_str())) && choice != "0") {
+        cout << endl << "Удалить:" << endl 
+             << "1 - автора" << endl
+             << "2 - книгу" << endl
+             << "3 - издательство" << endl
+             << "4 - связь" << endl
+             << "0 - назад" << endl;
+
+        cin >> choice;
+    }
     
-    return menuChoice;          
+    return menuChoice = atoi(choice.c_str());          
 }
 
 int ReplaceEnterChoice() {   
-    cout << endl << "Изменить:" << endl 
-         << "1 - автора" << endl
-         << "2 - книгу" << endl
-         << "3 - издательство" << endl
-         << "4 - связь" << endl
-         << "0 - назад" << endl;
-
     int menuChoice;
-    cin >> menuChoice;
-    
-    return menuChoice;        
+    string choice = " ";
+
+    while (!(atoi(choice.c_str())) && choice != "0") {
+        cout << endl << "Изменить:" << endl 
+             << "1 - автора" << endl
+             << "2 - книгу" << endl
+             << "3 - издательство" << endl
+             << "0 - назад" << endl;
+
+        cin >> choice;
+    }
+
+    return menuChoice = atoi(choice.c_str());        
 }
 
 int ShowEnterChoice() { 
-    cout << endl << "Показать:" << endl
-         << "1 - автора" << endl
-         << "2 - книгу" << endl
-         << "3 - издательство" << endl
-         << "0 - назад" << endl;
-    
     int menuChoice;
-    cin >> menuChoice;
+    string choice = " ";
+
+    while (!(atoi(choice.c_str())) && choice != "0") {
+        cout << endl << "Показать:" << endl
+             << "1 - автора" << endl
+             << "2 - книгу" << endl
+             << "3 - издательство" << endl
+             << "0 - назад" << endl;
     
-    return menuChoice;
+    
+        cin >> choice;
+    }
+    
+    return menuChoice = atoi(choice.c_str()); 
 }
